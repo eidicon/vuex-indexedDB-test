@@ -13,15 +13,14 @@ export interface IMainActions {
   removeItem: (payload: number) => Promise<void>;
 }
 
-const actions: ActionTree<any, IRootState> = {
+const actions: ActionTree<IPayload, IRootState> = {
   /**
    * @description fetch customer and populate it in store
    * @param context any
    */
   async checkStorage(context): Promise<void> {
     try {
-      const response = await IndexedDBInstance.checkStorage('demoItem');
-      context.commit('setState', response);
+      this.dispatch('main/updateState');
     } catch (err) {
       console.error('API Error Response:', err);
       context.commit('setState', []);
@@ -29,22 +28,38 @@ const actions: ActionTree<any, IRootState> = {
   },
 
   /**
-   * @description Saves new item and return full list of items (just for demo)
+   * @description Saves new item 
    * @param context any
    * @param payload IPayload
    */
   async saveItem(context, payload:IPayload): Promise<void> {
-    context.commit('setState', await IndexedDBInstance.saveToStorage('demoItem', payload));
+    try {
+      await IndexedDBInstance.saveToStorage('demoItem', payload);
+      this.dispatch('main/updateState');
+    } catch (err) {
+      console.error('API Error Response:', err);
+    }
+    
   },
 
   /**
-   * @description Saves new item and return full list of items (just for demo)
+   * @description Deletes item by key:id
    * @param context any
    * @param payload number
    */
   async removeItem(context, payload:number): Promise<void> {
-    context.commit('setState', await IndexedDBInstance.deleteFromStorage('demoItem', payload));
-  } 
+    try {
+      await IndexedDBInstance.deleteFromStorage('demoItem', payload);;
+      this.dispatch('main/updateState');
+    } catch (err) {
+      console.error('API Error Response:', err);
+    }
+  },
+
+  async updateState (context) {
+    const response = await IndexedDBInstance.checkStorage('demoItem');
+    context.commit('setState', response);
+  }
 };
 
 export default actions;

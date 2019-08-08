@@ -16,7 +16,7 @@ class IndexedDBService {
   private async init(): Promise<IDBPDatabase<TestDB>> {
     return await openDB<TestDB>('testIndex', 1, {
       upgrade(db) {
-        const itemStore = db.createObjectStore('demoItem', {keyPath: 'id', autoIncrement: true});
+        const itemStore = db.createObjectStore('demoItem', { keyPath: 'id', autoIncrement: true });
         itemStore.createIndex('by-value', 'value');
       }
     });
@@ -30,40 +30,18 @@ class IndexedDBService {
   }
 
   public async checkStorage(storeName: any): Promise<TestDB[] | undefined> {
-    try {
-      const db = await this.db;
-      const tx = await db.transaction(storeName, 'readonly');
-      const store = tx.objectStore(storeName);
-      return store.getAll();
-    } catch (err) {
-      throw new Error(err);
-    }
+    const db = await this.db;
+    return db.getAll(storeName);
   }
 
-
-  public async saveToStorage(storeName: any, payload: any): Promise<TestDB[] | undefined> {
-    try {
-      const db = await this.db;
-      const tx = await db.transaction(storeName, 'readwrite');
-      const store = tx.objectStore(storeName);
-      store.put(payload);
-      tx.done;
-      return store.getAll();
-    } catch (err) {
-      throw new Error(err);
-    }
+  public async saveToStorage(storeName: any, payload: any): Promise<void> {
+    const db = await this.db;
+    await db.put(storeName, payload);
   }
 
-  public async deleteFromStorage(storeName: any, payload: number): Promise<TestDB[] | undefined>  {
-    try {
-      const db = await this.db;
-      const tx = await db.transaction(storeName, 'readwrite');
-      const store = tx.objectStore(storeName);
-      store.delete(payload);
-      return store.getAll();
-    } catch (err) {
-      throw new Error(err);
-    }
+  public async deleteFromStorage(storeName: any, payload: number): Promise<void> {
+    const db = await this.db;
+    await db.delete(storeName, payload);
   }
 }
 
