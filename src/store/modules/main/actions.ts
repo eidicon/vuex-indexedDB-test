@@ -32,14 +32,14 @@ const actions: ActionTree<IPayload, IRootState> = {
    * @param context any
    * @param payload IPayload
    */
-  async saveItem(context, payload:IPayload): Promise<void> {
+  async saveItem(context, payload: IPayload): Promise<void> {
     try {
       await IndexedDBInstance.saveToStorage('demoItem', payload);
       this.dispatch('main/updateState');
     } catch (err) {
       console.error('API Error Response:', err);
     }
-    
+
   },
 
   /**
@@ -47,16 +47,16 @@ const actions: ActionTree<IPayload, IRootState> = {
    * @param context any
    * @param payload number
    */
-  async removeItem(context, payload:number): Promise<void> {
+  async removeItem(context, payload: number): Promise<void> {
     try {
-      await IndexedDBInstance.deleteFromStorage('demoItem', payload);;
+      await IndexedDBInstance.deleteFromStorage('demoItem', payload);
       this.dispatch('main/updateState');
     } catch (err) {
       console.error('API Error Response:', err);
     }
   },
 
-  async updateState (context) {
+  async updateState(context) {
     const response = await IndexedDBInstance.checkStorage('demoItem');
     context.commit('setState', response);
   }
